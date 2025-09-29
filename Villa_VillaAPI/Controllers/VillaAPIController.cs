@@ -82,7 +82,6 @@ namespace Villa_VillaAPI.Controllers
             {
                 ModelState.AddModelError("CustomerError", "Villa already Exists!");
                 return BadRequest(ModelState);
-                // ModelState stores validation errors; we use it here to return a BadRequest if input is invalid.
 
             }
             if (createDTO == null)
@@ -172,10 +171,6 @@ namespace Villa_VillaAPI.Controllers
             {
                 return BadRequest();
             }
-            //var villa = VillaStore.villaList.FirstOrDefault(u => u.Id == id);
-            //villa.Name = villaDTO.Name;
-            //villa.Sqft = villaDTO.Sqft;
-            //villa.Occupancy = villaDTO.Occupancy;
 
             Villa model = _mapper.Map<Villa>(updateDTO);
 
