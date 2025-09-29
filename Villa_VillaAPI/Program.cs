@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using Villa_VillaAPI.Data;
 
@@ -16,7 +15,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServe
 
 //builder.Host.UseSerilog(); // UseSerilog() is an extension method provided by the Serilog.AspNetCore package that configures Serilog as the logging provider for the application.
 
-builder.Services.AddControllers(option => option.ReturnHttpNotAcceptable = true).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+builder.Services.AddControllers(option => { 
+    //option.ReturnHttpNotAcceptable = true;
+    }).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+
 //builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
