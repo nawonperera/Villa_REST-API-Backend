@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Villa_VillaAPI;
 using Villa_VillaAPI.Data;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
          Add services to the container.
  ===========================================
 */
+
+builder.Services.AddAutoMapper(typeof(MappingConfig)); // AutoMapper is a library that helps to map objects of one type to another type. It is used to map DTOs (Data Transfer Objects) to Entities and vice versa.)
 
 builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection")));
 
@@ -18,7 +22,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServe
 builder.Services.AddControllers(option => { 
     //option.ReturnHttpNotAcceptable = true;
     }).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
-
+ 
 //builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
