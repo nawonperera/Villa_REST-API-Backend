@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using Villa_VillaAPI.Data;
-using Villa_VillaAPI.Model.Entity;
 using Villa_VillaAPI.Repository.IRepository;
 
 namespace Villa_VillaAPI.Repository
@@ -9,13 +8,21 @@ namespace Villa_VillaAPI.Repository
     public class Repository<T> : IRepository<T> where T : class
     {
         private readonly ApplicationDbContext _db;
-        // internal = accessible only inside the same project/assembly.
-        // "dbSet" represents a table in the database (but it's generic).
+
+        // "internal" → only code inside the same project can use this (not outside projects).
+        // "DbSet<T>" → represents a table in the database, but it's generic.
+        // If T = Villa → dbSet = Villas table
+        // If T = Category → dbSet = Categories table
         internal DbSet<T> dbSet;
+
         public Repository(ApplicationDbContext db)
         {
+            // Save the database connection that is passed into this class
             _db = db;
-            // "Set<T>()" → gives the correct table based on T
+
+            // Get the correct table from the database based on T (the generic type).
+            // Example: if T = Villa → this.dbSet = _db.Villas
+            //          if T = Category → this.dbSet = _db.Categories
             this.dbSet = _db.Set<T>();
         }
 
