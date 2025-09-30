@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Villa_VillaAPI.Data;
 using Villa_VillaAPI.Model.Dto;
 using Villa_VillaAPI.Model.Entity;
+using Villa_VillaAPI.Repository.IRepository;
 
 namespace Villa_VillaAPI.Controllers
 {
@@ -14,15 +12,13 @@ namespace Villa_VillaAPI.Controllers
     public class VillaAPIController : ControllerBase
     {
 
-        private readonly ApplicationDbContext _db;
+        private readonly IVillaRepository _dbVilla;
         private readonly IMapper _mapper;
-        public VillaAPIController(ApplicationDbContext db, IMapper mapper)
+        public VillaAPIController(IVillaRepository dbVilla, IMapper mapper)
         {
-            _db = db;
+            _dbVilla = dbVilla;
             _mapper = mapper;
         }
-
-
 
         /*
          =====================================================
@@ -33,10 +29,9 @@ namespace Villa_VillaAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VillaDTO>>> GetVillas()
         {
-            IEnumerable<Villa> villaList = await _db.Villas.ToListAsync();
+            IEnumerable<Villa> villaList = await _dbVilla.GetAllAsync();
             return Ok(_mapper.Map<List<VillaDTO>>(villaList)); // Maps the list of Villa entities to a list of VillaDTOs and returns it with an HTTP 200 OK response.
         }
-
 
         /*
          =====================================================
@@ -55,7 +50,7 @@ namespace Villa_VillaAPI.Controllers
             {
                 return BadRequest();
             }
-            var villa = await _db.Villas.FirstOrDefaultAsync(u => u.Id == id);
+            var villa = await _dbVilla.GetAsync(u => u.Id == id);
             if(villa == null)
             {
                 return NotFound();
@@ -78,7 +73,7 @@ namespace Villa_VillaAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<VillaDTO>> CreateVilla([FromBody]VillaCreateDTO createDTO)
         {
-            if(await _db.Villas.FirstOrDefaultAsync(u=>u.Name.ToLower() == createDTO.Name.ToLower()) != null)
+            if(await _dbVilla.GetAsync(u=>u.Name.ToLower() == createDTO.Name.ToLower()) != null)
             {
                 ModelState.AddModelError("CustomerError", "Villa already Exists!");
                 return BadRequest(ModelState);
@@ -104,8 +99,8 @@ namespace Villa_VillaAPI.Controllers
             //    Details = createDTO.Details
             //};
 
-            await _db.Villas.AddAsync(model);
-            await _db.SaveChangesAsync();
+            await _dbVilla.CreateAsync(model);
+            await _dbVilla.SaveAsync();
 
             return CreatedAtRoute("Getvilla", new { id = model.Id }, model);
             // CreatedAtRoute → used after adding a new item (like a villa).
@@ -145,13 +140,12 @@ namespace Villa_VillaAPI.Controllers
             {
                 return BadRequest();
             }
-            var villa = await _db.Villas.FirstOrDefaultAsync(u => u.Id == id);
+            var villa = await _dbVilla.GetAsync(u => u.Id == id);
             if(villa == null)
             {
                 return NotFound();
             }
-            _db.Villas.Remove(villa);
-            await _db.SaveChangesAsync();
+            await _dbVilla.RemoveAsync(villa);
             return NoContent();
         }
 
@@ -186,9 +180,7 @@ namespace Villa_VillaAPI.Controllers
             //    Details = updateDTO.Details
             //};
 
-            _db.Villas.Update(model);
-            await _db.SaveChangesAsync();
-
+            await _dbVilla.UpdateAsync(model);
             return NoContent();
         }
 
@@ -208,7 +200,7 @@ namespace Villa_VillaAPI.Controllers
             {
                 return BadRequest();
             }
-            var villa = await _db.Villas.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id); // Fetches the first Villa with the given Id from the database without tracking changes (read-only)
+            var villa = await _dbVilla.GetAsync(u => u.Id == id, tracked : false); // Fetches the first Villa with the given Id from the database without tracking changes (read-only)
 
             VillaUpdateDTO villaDTO = _mapper.Map<VillaUpdateDTO>(villa);
 
@@ -245,9 +237,8 @@ namespace Villa_VillaAPI.Controllers
             //    Details = villaDTO.Details
             //};
 
-            _db.Villas.Update(model);
-            await _db.SaveChangesAsync();
-
+            await _dbVilla.UpdateAsync(model);
+           
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
