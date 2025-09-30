@@ -3,9 +3,7 @@
 namespace Villa_VillaAPI.Model.Dto
 {
     public class VillaCreateDTO
-    {
-
-        
+    {        
         [Required]
         [MaxLength(30)]
         public string Name { get; set; }
