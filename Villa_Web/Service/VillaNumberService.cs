@@ -5,22 +5,22 @@ using Villa_Web.Service.IServices;
 
 namespace Villa_Web.Service;
 
-public class VillaService : BaseService, IVillaService
+public class VillaNumberService : BaseService, IVillaNumberService
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly string villaUrl;
-    public VillaService(IHttpClientFactory httpClientFactory, IConfiguration configuration) : base(httpClientFactory)
+    public VillaNumberService(IHttpClientFactory httpClientFactory, IConfiguration configuration) : base(httpClientFactory)
     {
         _httpClientFactory = httpClientFactory;
         villaUrl = configuration.GetValue<string>("ServiceUrls:VillaAPI");
     }
-    public Task<T> CreateAsync<T>(VillaCreateDTO dto)
+    public Task<T> CreateAsync<T>(VillaNumberCreateDTO dto)
     {
         return SendAsync<T>(new APIRequest()
         {
             ApiType = SD.ApiType.POST,
             Data = dto,
-            Url = villaUrl + "/api/VillaAPI"
+            Url = villaUrl + "/api/VillaNumberAPI"
         });
     }
 
@@ -29,7 +29,7 @@ public class VillaService : BaseService, IVillaService
         return SendAsync<T>(new APIRequest()
         {
             ApiType = SD.ApiType.DELETE,
-            Url = villaUrl + "/api/VillaAPI/" + id
+            Url = villaUrl + "/api/VillaNumberAPI/" + id
         });
     }
 
@@ -38,7 +38,7 @@ public class VillaService : BaseService, IVillaService
         return SendAsync<T>(new APIRequest()
         {
             ApiType = SD.ApiType.GET,
-            Url = villaUrl + "/api/VillaAPI"
+            Url = villaUrl + "/api/VillaNumberAPI"
         });
     }
 
@@ -47,17 +47,17 @@ public class VillaService : BaseService, IVillaService
         return SendAsync<T>(new APIRequest()
         {
             ApiType = SD.ApiType.GET,
-            Url = villaUrl + "/api/VillaAPI/" + id
+            Url = villaUrl + "/api/VillaNumberAPI/" + id
         });
     }
 
-    public Task<T> UpdateAsync<T>(VillaUpdateDTO dto)
+    public Task<T> UpdateAsync<T>(VillaNumberUpdateDTO dto)
     {
         return SendAsync<T>(new APIRequest()
         {
             ApiType = SD.ApiType.PUT,
             Data = dto,
-            Url = villaUrl + "/api/VillaAPI/" + dto.Id
+            Url = villaUrl + "/api/VillaNumberAPI/" + dto.VillaNo
         });
     }
 }

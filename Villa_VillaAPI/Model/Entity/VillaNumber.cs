@@ -7,6 +7,7 @@ namespace Villa_VillaAPI.Model.Entity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)] // Ensure VillaNo is not auto-generated
         public int VillaNo { get; set; }
+
         [ForeignKey("Villa")]
         public int VillaId { get; set; }
         public Villa Villa { get; set; } // Navigation property to the Villa entity

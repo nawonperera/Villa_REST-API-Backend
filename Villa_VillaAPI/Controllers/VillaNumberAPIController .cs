@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Villa_VillaAPI.Model;
@@ -38,7 +37,7 @@ namespace Villa_VillaAPI.Controllers
         {
             try
             {
-                IEnumerable<VillaNumber> villaNumberList = await _dbVillaNumber.GetAllAsync();
+                IEnumerable<VillaNumber> villaNumberList = await _dbVillaNumber.GetAllAsync(includeProperties: "Villa");
                 // Maps the list of Villa entities to a list of VillaDTOs and returns it with an HTTP 200 OK response.
                 _response.Result = _mapper.Map<List<VillaNumberDTO>>(villaNumberList);
                 _response.StatusCode = HttpStatusCode.OK;
@@ -110,14 +109,14 @@ namespace Villa_VillaAPI.Controllers
             {
                 if (await _dbVillaNumber.GetAsync(u => u.VillaNo == createNumberDTO.VillaNo) != null)
                 {
-                    ModelState.AddModelError("CustomerError", "Villa Number already Exists!");
+                    ModelState.AddModelError("ErrorMessages", "Villa Number already Exists!");
                     return BadRequest(ModelState);
 
                 }
 
                 if (await _dbVilla.GetAsync(u => u.Id == createNumberDTO.VillaId) == null)
                 {
-                    ModelState.AddModelError("CustomerError", "Villa Id is Invalid!");
+                    ModelState.AddModelError("ErrorMessages", "Villa Id is Invalid!");
                     return BadRequest(ModelState);
                 }
 
@@ -198,7 +197,7 @@ namespace Villa_VillaAPI.Controllers
 
                 if (await _dbVilla.GetAsync(u => u.Id == updateDTO.VillaId) == null)
                 {
-                    ModelState.AddModelError("CustomerError", "Villa Id is Invalid!");
+                    ModelState.AddModelError("ErrorMessages", "Villa Id is Invalid!");
                     return BadRequest(ModelState);
                 }
 

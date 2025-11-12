@@ -32,6 +32,7 @@ namespace Villa_VillaAPI.Controllers
         */
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<APIResponse>> GetVillas()
         {
             try
@@ -108,7 +109,7 @@ namespace Villa_VillaAPI.Controllers
             {
                 if (await _dbVilla.GetAsync(u => u.Name.ToLower() == createDTO.Name.ToLower()) != null)
                 {
-                    ModelState.AddModelError("CustomerError", "Villa already Exists!");
+                    ModelState.AddModelError("ErrorMessages", "Villa already Exists!");
                     return BadRequest(ModelState);
 
                 }
@@ -136,6 +137,10 @@ namespace Villa_VillaAPI.Controllers
                 _response.Result = _mapper.Map<VillaDTO>(model);
                 _response.StatusCode = HttpStatusCode.Created;
                 return CreatedAtRoute("Getvilla", new { id = model.Id }, _response);
+                //CreatedAtRoute(...) A helper method from ControllerBase that returns 201 Created + route location
+                // "Getvilla"  The name of the route to which this newly created resource belongs
+                // new { id = model.Id }   The route values(used to generate the URL for that route)
+                // _response The actual data object you send back to the client
             }
             catch (Exception ex)
             {

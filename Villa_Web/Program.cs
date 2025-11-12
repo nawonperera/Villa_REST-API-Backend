@@ -9,7 +9,12 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 builder.Services.AddHttpClient<IVillaService, VillaService>();
+// Registers an HttpClient that can be injected into the VillaService.
 builder.Services.AddScoped<IVillaService, VillaService>();
+// Registers VillaService with a Scoped lifetime, creating a new instance per request and allowing IVillaService to be injected where needed.
+
+builder.Services.AddHttpClient<IVillaNumberService, VillaNumberService>();
+builder.Services.AddScoped<IVillaNumberService, VillaNumberService>();
 
 var app = builder.Build();
 

@@ -1,17 +1,12 @@
 ﻿using System.Linq.Expressions;
-using Villa_VillaAPI.Model.Entity;
 
 namespace Villa_VillaAPI.Repository.IRepository
 {
-    // "IRepository<T>" → a generic interface. 
-    // "T" → placeholder for any class type (like Villa, Category, Product, etc.).
-    // "where T : class" → constraint: T must be a reference type (a class, not int, bool, etc.).
-    // In short: IRepository<T> is a reusable blueprint for repositories.
-    // Example: IRepository<Villa>, IRepository<Category>, etc.
+
     public interface IRepository<T> where T : class
     {
-        Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null);
-        Task<T> GetAsync(Expression<Func<T, bool>>? filter = null, bool tracked = true);
+        Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null);
+        Task<T> GetAsync(Expression<Func<T, bool>>? filter = null, bool tracked = true, string? includeProperties = null);
 
         Task CreateAsync(T entity);
         Task RemoveAsync(T entity);
@@ -19,10 +14,14 @@ namespace Villa_VillaAPI.Repository.IRepository
     }
 }
 
-
-
-
 /*
+
+    // "IRepository<T>" → a generic interface. 
+    // "T" → placeholder for any class type (like Villa, Category, Product, etc.).
+    // "where T : class" → constraint: T must be a reference type (a class, not int, bool, etc.).
+    // In short: IRepository<T> is a reusable blueprint for repositories.
+    // Example: IRepository<Villa>, IRepository<Category>, etc.
+
 Explanation of the methods:
 
 1. Task<List<Villa>> GetAll(Expression<Func<Villa, bool>> filter = null);
