@@ -1,13 +1,12 @@
-﻿namespace Villa_Utility
+﻿namespace Villa_Utility;
+
+public static class SD
 {
-    public static class SD
+    public enum ApiType
     {
-        public enum ApiType
-        {
-            GET,
-            POST,
-            PUT,
-            DELETE
-        }
+        GET,
+        POST,
+        PUT,
+        DELETE
     }
 }
