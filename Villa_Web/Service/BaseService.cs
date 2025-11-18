@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Net.Http.Headers;
 using System.Text;
 using Villa_Utility;
 using Villa_Web.Models;
@@ -47,6 +48,12 @@ public class BaseService : IBaseService
             }
 
             HttpResponseMessage? apiResponse = null; // This will hold the response from the API
+
+            if (!string.IsNullOrEmpty(apiRequest.Token))
+            {
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", apiRequest.Token);
+            }
 
             apiResponse = await client.SendAsync(message); // Send the HTTP request asynchronously and wait for the response.
 

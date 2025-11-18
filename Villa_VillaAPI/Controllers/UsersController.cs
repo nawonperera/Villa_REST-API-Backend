@@ -32,8 +32,10 @@ public class UsersController : Controller
         _response.StatusCode = HttpStatusCode.OK;
         _response.IsSuccess = true;
         _response.Result = LoginResponse;
-        return BadRequest(_response);
+        return Ok(_response);
     }
+
+
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegistrationRequestDto model)
     {
