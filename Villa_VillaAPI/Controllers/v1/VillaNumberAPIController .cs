@@ -7,10 +7,13 @@ using Villa_VillaAPI.Model.Dto;
 using Villa_VillaAPI.Model.Entity;
 using Villa_VillaAPI.Repository.IRepository;
 
-namespace Villa_VillaAPI.Controllers;
+namespace Villa_VillaAPI.Controllers.v1;
 
-[Route("api/VillaNumberAPI")]
+[Route("api/v{version:apiVersion}/VillaNumberAPI")]
 [ApiController]
+[ApiVersion("1.0")]
+// [ApiVersion("1.0", Deprecated = true)] // "Deprecated" means this version is old and should not be used anymore. It still works, but it may be removed in future updates.
+
 public class VillaNumberAPIController : ControllerBase
 {
     // _response → this is an object that will hold the API response we send back to the client. (status, message, data, etc.).
@@ -23,7 +26,7 @@ public class VillaNumberAPIController : ControllerBase
         _dbVillaNumber = dbVillaNumber;
         _mapper = mapper;
         // Create a new empty APIResponse object (ready to be filled and returned).
-        this._response = new();
+        _response = new();
         _dbVilla = dbVilla;
     }
 
@@ -33,7 +36,9 @@ public class VillaNumberAPIController : ControllerBase
      =====================================================
     */
 
+    //[MapToApiVersion("1.0")]
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<APIResponse>> GetVillaNumbers()
     {
         try
@@ -52,11 +57,19 @@ public class VillaNumberAPIController : ControllerBase
         return _response;
     }
 
+    [HttpGet("GetString")]
+    public IEnumerable<string> Get()
+    {
+        return new string[] { "string1", "string2" };
+    }
+
     /*
      =====================================================
                            Get One
      =====================================================
     */
+
+
 
     [HttpGet("{id:int}", Name = "GetVillaNumber")]
     [ProducesResponseType(StatusCodes.Status201Created)]

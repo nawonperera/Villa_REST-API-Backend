@@ -61,8 +61,8 @@ public class BaseService : IBaseService
             try
             {
                 APIResponse ApiResponse = JsonConvert.DeserializeObject<APIResponse>(apiContent); // Convert (deserialize) the JSON response into a C# object of type T.
-                if (apiResponse.StatusCode == System.Net.HttpStatusCode.BadRequest
-                    || apiResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
+                if (ApiResponse != null && (apiResponse.StatusCode == System.Net.HttpStatusCode.BadRequest
+                    || apiResponse.StatusCode == System.Net.HttpStatusCode.NotFound))
                 {
                     ApiResponse.StatusCode = System.Net.HttpStatusCode.BadRequest;
                     ApiResponse.IsSuccess = false;

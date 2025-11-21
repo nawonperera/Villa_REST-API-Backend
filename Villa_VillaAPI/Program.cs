@@ -22,6 +22,35 @@ builder.Services.AddScoped<IVillaRepository, VillaRepository>();
 builder.Services.AddScoped<IVillaNumberRepository, VillaNumberRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true; // If the client does not specify an API version, use the default version
+    options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0); // Set the default API version to 1.0
+    options.ReportApiVersions = true; // Report the supported API versions in the response headers
+});
+
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    // Format of API version names in Swagger and other tools
+    // "'v'VVV" means:
+    //   - Start with "v"
+    //   - Followed by a 3-digit version number
+    // Examples:
+    //   v1  -> v001
+    //   v2  -> v002
+    //   v10 -> v010
+    // This helps keep Swagger docs consistent for multiple API versions.
+    options.GroupNameFormat = "'v'VVV";
+
+    // Replace the version placeholder in route URLs with the actual version number
+    // Example:
+    //   Route:      "api/v{version}/users"
+    //   Version:    1
+    //   Final URL:  "api/v1/users"
+    options.SubstituteApiVersionInUrl = true;
+});
+
+
 //Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.File("log/villaLogs.txt", rollingInterval: RollingInterval.Day).CreateLogger();
 //builder.Host.UseSerilog(); // UseSerilog() is an extension method provided by the Serilog.AspNetCore package that configures Serilog as the logging provider for the application.
 
@@ -79,6 +108,40 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1.0",
+        Title = "Crystal Villa V1",
+        Description = "API to manage Villa",
+        TermsOfService = new Uri("https://example.com/terms"),
+        Contact = new OpenApiContact
+        {
+            Name = "Dotnetmastery",
+            Url = new Uri("https://dotnetmastery.com")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "Example License",
+            Url = new Uri("https://example.com/license")
+        }
+    });
+    options.SwaggerDoc("v2", new OpenApiInfo
+    {
+        Version = "v2.0",
+        Title = "Crystal Villa v2",
+        Description = "API to manage Villa",
+        TermsOfService = new Uri("https://example.com/terms"),
+        Contact = new OpenApiContact
+        {
+            Name = "Dotnetmastery",
+            Url = new Uri("https://dotnetmastery.com")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "Example License",
+            Url = new Uri("https://example.com/license")
+        }
+    });
 });
 
 var app = builder.Build();
@@ -92,7 +155,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "VillaV1");
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "VillaV2");
+    });
 }
 
 app.UseHttpsRedirection();

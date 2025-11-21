@@ -8,10 +8,11 @@ using Villa_VillaAPI.Model.Dto;
 using Villa_VillaAPI.Model.Entity;
 using Villa_VillaAPI.Repository.IRepository;
 
-namespace Villa_VillaAPI.Controllers
+namespace Villa_VillaAPI.Controllers.v1
 {
-    [Route("api/VillaAPI")]
+    [Route("api/v{version:apiVersion}/VillaAPI")]
     [ApiController]
+    [ApiVersion("1.0")]
     public class VillaAPIController : ControllerBase
     {
         // _response → this is an object that will hold the API response we send back to the client. (status, message, data, etc.).
@@ -23,7 +24,7 @@ namespace Villa_VillaAPI.Controllers
             _dbVilla = dbVilla;
             _mapper = mapper;
             // Create a new empty APIResponse object (ready to be filled and returned).
-            this._response = new();
+            _response = new();
         }
 
         /*

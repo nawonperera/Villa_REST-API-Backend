@@ -6,8 +6,9 @@ using Villa_VillaAPI.Repository.IRepository;
 
 namespace Villa_VillaAPI.Controllers;
 
-[Route("api/UsersAuth")]
+[Route("api/v{version:apiVersion}/UsersAuth")]
 [ApiController]
+[ApiVersionNeutral] // This controller is not linked to any specific API version. It works with all versions, no matter what version the client requests.
 public class UsersController : Controller
 {
     private readonly IUserRepository _userRepo;
