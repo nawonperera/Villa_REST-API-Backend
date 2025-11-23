@@ -54,7 +54,8 @@ namespace Villa_VillaAPI.Repository
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
+        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null,
+            int pageSize = 0, int pageNumber = 1)
         {
             // _db.Villas represents the DbSet for the Villa table(from your EF Core DbContext).
             // IQueryable means it’s a query that hasn’t run yet — it can be built step by step.
@@ -71,6 +72,25 @@ namespace Villa_VillaAPI.Repository
                     query = query.Include(includeProp);
                 }
             }
+
+            if (pageSize > 0)
+            {
+                // If the client requests more than 100 items, limit it to 100 to prevent very large queries.
+                if (pageSize > 100)
+                {
+                    pageSize = 100;
+                }
+                // Apply pagination:
+                // Skip = how many items to skip before starting the page
+                // Take = how many items to return for the page
+                // Example:
+                // pageNumber = 2, pageSize = 10
+                // Skip = 10 * (2 - 1) = 10 → skip first 10 items
+                // Take = 10 → return the next 10 items
+                query = query.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+            }
+
+
             // This executes the query and fetches data from the database.
             // ToListAsync() converts the result into a List<Villa> asynchronously.
             return await query.ToListAsync();

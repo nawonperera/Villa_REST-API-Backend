@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Text.Json;
 using Villa_VillaAPI.Model;
 using Villa_VillaAPI.Model.Dto;
 using Villa_VillaAPI.Model.Entity;
@@ -34,15 +35,38 @@ namespace Villa_VillaAPI.Controllers.v1
         */
 
         [HttpGet]
-
+        //[ResponseCache(Duration = 30)]
+        [ResponseCache(CacheProfileName = "Default30")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<APIResponse>> GetVillas()
+        public async Task<ActionResult<APIResponse>> GetVillas([FromQuery(Name = "filterOccupancy")] int? occupancy,
+            [FromQuery] string? search, int pageSize = 0, int pageNumber = 1)
         {
             try
             {
-                IEnumerable<Villa> villaList = await _dbVilla.GetAllAsync();
+                IEnumerable<Villa> villaList;
+
+                if (occupancy > 0)
+                {
+                    villaList = await _dbVilla.GetAllAsync(u => u.Occupancy == occupancy, pageSize: pageSize,
+                        pageNumber: pageNumber);
+                }
+                else
+                {
+                    villaList = await _dbVilla.GetAllAsync(pageSize: pageSize,
+                        pageNumber: pageNumber);
+                }
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    villaList = villaList.Where(u => u.Amenity.ToLower().Contains(search)
+                    || u.Name.ToLower().Contains(search));
+                }
+
+                Pagination pagination = new() { PageNumber = pageNumber, PageSize = pageSize };
+                Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(pagination));
+
                 // Maps the list of Villa entities to a list of VillaDTOs and returns it with an HTTP 200 OK response.
                 _response.Result = _mapper.Map<List<VillaDTO>>(villaList);
                 _response.StatusCode = HttpStatusCode.OK;
@@ -68,7 +92,10 @@ namespace Villa_VillaAPI.Controllers.v1
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-
+        // [ResponseCache(Duration = 30)] // Caches the response for 30 seconds. During this time, repeated requests return the cached result instead of re-running the action.
+        // [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)] // Disables caching completely. Every request gets a fresh response, and nothing is stored in any cache.
+        // Location = ResponseCacheLocation.None => // Do not store the response in any cache (not in browser, server, or proxy).
+        // NoStore = true => // Do not save the response at all — even temporarily. Ensures the response is always generated fresh.
         public async Task<ActionResult<APIResponse>> GetVilla(int id)
         {
             try

@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Villa_VillaAPI;
 using Villa_VillaAPI.Data;
+using Villa_VillaAPI.Model;
 using Villa_VillaAPI.Repository;
 using Villa_VillaAPI.Repository.IRepository;
 
@@ -18,6 +21,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAutoMapper(typeof(MappingConfig)); // AutoMapper is a library that helps to map objects of one type to another type. It is used to map DTOs (Data Transfer Objects) to Entities and vice versa.)
 builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection")));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>().
+    AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddResponseCaching();
+
 builder.Services.AddScoped<IVillaRepository, VillaRepository>();
 builder.Services.AddScoped<IVillaNumberRepository, VillaNumberRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -75,6 +84,11 @@ builder.Services.AddAuthentication(x =>    // Add authentication services to the
 
 builder.Services.AddControllers(option =>
 {
+    option.CacheProfiles.Add("Default30",
+        new CacheProfile
+        {
+            Duration = 30
+        });
     //option.ReturnHttpNotAcceptable = true;
 }).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
 
